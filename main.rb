@@ -24,7 +24,7 @@ helpers do
   end
   
   def display_card_image(card)
-    return "<img src='/images/cards/#{card[0]}_#{card[1]}.jpg' >"
+    "<img src='/images/cards/#{card[0]}_#{card[1]}.jpg'>"
   end
 
   def calculate_total(hand)
@@ -38,13 +38,13 @@ helpers do
       end
     end  
     card_values.select {|v| v == 'ace'}.size.times do
-      total -= 10 if total > 21
+      total -= 10 if total > BLACKJACK
     end   
     total
   end
 
   def blackjack?(hand)
-    calculate_total(hand) == 21
+    calculate_total(hand) == BLACKJACK
   end
 
   def bust?(hand)
@@ -52,19 +52,11 @@ helpers do
   end 
 
   def player_turn_over?(hand)
-    if bust?(hand) || blackjack?(hand)
-      true
-    else
-      false
-    end
+    bust?(hand) || blackjack?(hand)
   end
 
   def dealer_turn_over?(dealer_hand)
-    if player_turn_over?(dealer_hand) || calculate_total(dealer_hand) >= 17
-      true
-    else
-      false
-    end
+    player_turn_over?(dealer_hand) || calculate_total(dealer_hand) >= 17
   end
 
   def display_end_of_round_message(player_hand, dealer_hand)
@@ -82,12 +74,7 @@ helpers do
   end
 
   def did_player_win?(player_hand, dealer_hand)
-    if blackjack?(player_hand)  
-      true
-    elsif calculate_total(player_hand) > calculate_total(dealer_hand) && !bust?(player_hand)
-      true
-    else
-      false
+    if blackjack?(player_hand) || (calculate_total(player_hand) > calculate_total(dealer_hand)) && !bust?(player_hand)
     end
   end
 end

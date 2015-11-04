@@ -37,7 +37,7 @@
     <%= display_card_image(card) %>
   <% end %>
   <% if session[:turn] == 'dealer' %>
-    <p>You stay at <%=calculate_total(session[:dealer_hand]) %>. You bet 
+    <p>You stay at <%=calculate_total(session[:player_hand]) %>. You bet 
     $<%= session[:bet_amount] %> this round. </p>
   <% end %>
 </div>

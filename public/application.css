@@ -11,10 +11,10 @@ form#stay_form {
 form#yes_form {
   float: left;
   margin-right: 5px;
-  margin-bottom: 10px;
+  
 }
 
 form#no_form {
   float: left;
-  margin-bottom: 10px;
+
 }
