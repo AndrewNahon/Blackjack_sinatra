@@ -1,0 +1,20 @@
+form#hit_form {
+  float: left;
+  margin-right: 5px;
+
+}
+
+form#stay_form {
+  float: left;
+}
+
+form#yes_form {
+  float: left;
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+
+form#no_form {
+  float: left;
+  margin-bottom: 10px;
+}
