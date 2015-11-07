@@ -7,6 +7,7 @@ use Rack::Session::Cookie, :key => 'rack.session',
                            :path => '/',
                            :secret => 'end_of_world' 
 BLACKJACK = 21
+PLAYER_AMOUNT = 1000
 
 helpers do 
 
@@ -74,13 +75,13 @@ helpers do
   end
 
   def did_player_win?(player_hand, dealer_hand)
-    if blackjack?(player_hand) || (calculate_total(player_hand) > calculate_total(dealer_hand)) && !bust?(player_hand)
-    end
+    blackjack?(player_hand) || ((calculate_total(player_hand) > calculate_total(dealer_hand)) && !bust?(player_hand))
   end
 end
 
 before do
   @display_hit_stay_buttons = true
+
 end
 
 get '/' do
@@ -100,11 +101,7 @@ post '/new_game' do
     halt erb :new_game
   end
   session[:username] = params[:username]
-  session[:player_amount] = 1000
-  session[:player_hand] = []
-  session[:dealer_hand] = []
-  create_deck
-  deal
+  session[:player_amount] = PLAYER_AMOUNT
   redirect "/bet"
 end
 
@@ -119,44 +116,45 @@ post '/bet' do
   end
   session[:player_hand] = []
   session[:dealer_hand] = []
+  session[:turn] = 'player'
   create_deck
   deal
   session[:bet_amount] = params[:bet_amount].to_i
-  session[:turn] = 'player'
   session[:won_hand] = false
-  redirect "/game"
+  redirect "/game/player"
 end
 
-get '/game' do
-  if session[:turn] == 'player'
-    if player_turn_over?(session[:player_hand])
+get '/game/player' do
+  if player_turn_over?(session[:player_hand])
       @display_hit_stay_buttons = false
       bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
-    end
-  elsif session[:turn] = 'dealer'
-    @show_dealer_hit_button = true
-    @display_hit_stay_buttons = false
-    if dealer_turn_over?(session[:dealer_hand])
-      @show_dealer_hit_button = false
-      display_end_of_round_message(session[:player_hand], session[:dealer_hand])
-    end
-  end  
+  end
   erb :game
 end
 
 post "/game/hit" do
   session[:player_hand] << session[:deck].pop
-  redirect "/game"
+  redirect "/game/player"
 end
 
 post "/game/stay" do  
   session[:turn] = 'dealer'
-  redirect "/game"
+  redirect "/game/dealer"
+end
+
+get "/game/dealer" do
+  @show_dealer_hit_button = true
+  @display_hit_stay_buttons = false
+  if dealer_turn_over?(session[:dealer_hand])
+      @show_dealer_hit_button = false
+      display_end_of_round_message(session[:player_hand], session[:dealer_hand])
+  end
+  erb :game
 end
 
 post "/game/dealer_hit" do
   session[:dealer_hand] << session[:deck].pop
-  redirect "/game"
+  redirect "/game/dealer"
 end
 
 post '/game/play_again' do
