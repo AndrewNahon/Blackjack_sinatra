@@ -110,10 +110,14 @@ get "/bet" do
 end
 
 post '/bet' do
-  if params[:bet_amount].to_i > session[:player_amount]
+  if params[:bet_amount].to_i > session[:player_amount] 
     @error = "Max bet is $#{session[:player_amount]} "
     halt erb :bet
+  elsif params[:bet_amount].to_i < 1
+    @error = "You must bet a positive amount."
+    halt erb :bet
   end
+
   session[:player_hand] = []
   session[:dealer_hand] = []
   session[:turn] = 'player'
@@ -134,7 +138,15 @@ end
 
 post "/game/hit" do
   session[:player_hand] << session[:deck].pop
-  redirect "/game/player"
+  redirect "/game/player/hit"
+end
+
+get "/game/player/hit" do
+  if player_turn_over?(session[:player_hand])
+      @display_hit_stay_buttons = false
+      bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
+  end
+  erb :game, layout: false
 end
 
 post "/game/stay" do  
@@ -149,11 +161,12 @@ get "/game/dealer" do
       @show_dealer_hit_button = false
       display_end_of_round_message(session[:player_hand], session[:dealer_hand])
   end
-  erb :game
+  erb :game, layout: false
 end
 
 post "/game/dealer_hit" do
   session[:dealer_hand] << session[:deck].pop
+  session[:turn] = 'dealer'
   redirect "/game/dealer"
 end
 
