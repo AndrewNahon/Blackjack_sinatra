@@ -18,9 +18,9 @@ helpers do
   end
 
   def deal
-     2.times do
-    session[:dealer_hand] << session[:deck].pop 
-    session[:player_hand] << session[:deck].pop  
+    2.times do
+      session[:dealer_hand] << session[:deck].pop 
+      session[:player_hand] << session[:deck].pop  
     end
   end
   
@@ -60,11 +60,11 @@ helpers do
     player_turn_over?(dealer_hand) || calculate_total(dealer_hand) >= 17
   end
 
-  def display_end_of_round_message(player_hand, dealer_hand)
+  def set_end_of_round_message(player_hand, dealer_hand)
     if blackjack?(dealer_hand)
       @error = "Dealer got blackjack. You lose."
     elsif bust?(dealer_hand)
-      @success = "Dealer busted at #{calculate_total[dealer_hand]}. You win."
+      @success = "Dealer busted at #{calculate_total(dealer_hand)}. You win."
     elsif calculate_total(player_hand) < calculate_total(dealer_hand)
       @error = "Dealer won. You had #{calculate_total(player_hand)} and dealer had #{calculate_total(dealer_hand)}"
     elsif calculate_total(player_hand) == calculate_total(dealer_hand)
@@ -75,7 +75,8 @@ helpers do
   end
 
   def did_player_win?(player_hand, dealer_hand)
-    blackjack?(player_hand) || ((calculate_total(player_hand) > calculate_total(dealer_hand)) && !bust?(player_hand))
+    blackjack?(player_hand) || 
+    ((calculate_total(player_hand) > calculate_total(dealer_hand)) && !bust?(player_hand))
   end
 end
 
@@ -130,8 +131,8 @@ end
 
 get '/game/player' do
   if player_turn_over?(session[:player_hand])
-      @display_hit_stay_buttons = false
-      bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
+    @display_hit_stay_buttons = false
+    bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
   end
   erb :game
 end
@@ -143,8 +144,8 @@ end
 
 get "/game/player/hit" do
   if player_turn_over?(session[:player_hand])
-      @display_hit_stay_buttons = false
-      bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
+    @display_hit_stay_buttons = false
+    bust?(session[:player_hand]) ? @error = "You busted at #{calculate_total(session[:player_hand])}" : @success = "You hit blackjack."
   end
   erb :game, layout: false
 end
@@ -154,20 +155,20 @@ post "/game/stay" do
   redirect "/game/dealer"
 end
 
-get "/game/dealer" do
-  @show_dealer_hit_button = true
-  @display_hit_stay_buttons = false
-  if dealer_turn_over?(session[:dealer_hand])
-      @show_dealer_hit_button = false
-      display_end_of_round_message(session[:player_hand], session[:dealer_hand])
-  end
-  erb :game, layout: false
-end
-
 post "/game/dealer_hit" do
   session[:dealer_hand] << session[:deck].pop
   session[:turn] = 'dealer'
   redirect "/game/dealer"
+end
+
+get "/game/dealer" do
+  @show_dealer_hit_button = true
+  @display_hit_stay_buttons = false
+  if dealer_turn_over?(session[:dealer_hand])
+    @show_dealer_hit_button = false
+    set_end_of_round_message(session[:player_hand], session[:dealer_hand])
+  end
+  erb :game, layout: false
 end
 
 post '/game/play_again' do

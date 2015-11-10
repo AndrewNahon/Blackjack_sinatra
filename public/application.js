@@ -10,7 +10,7 @@ function player_hit() {
       type: "POST",
       url: "/game/hit"
     }).done(function(msg) {
-      $("div#game").replaceWith(msg)
+      $("div#game").replaceWith(msg);
     });
     return false;
   });
@@ -22,7 +22,7 @@ function player_stay() {
       type: "POST",
       url: "/game/stay"
     }).done(function(msg) {
-      $("div#game").replaceWith(msg)
+      $("div#game").replaceWith(msg);
     });
     return false;
   });
@@ -34,7 +34,7 @@ function dealer_hit() {
       type: "POST",
       url: "/game/dealer_hit"
     }).done(function(msg) {
-      $("div#game").replaceWith(msg)
+      $("div#game").replaceWith(msg);
     });
     return false;
   });
